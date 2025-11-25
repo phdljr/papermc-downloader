@@ -7,13 +7,13 @@
 ## 사용 방법
 1. 프로젝트 파일을 실행합니다.
 2. 원하는 버전과 빌드를 선택합니다.
-![img.png](docs/img.png)
+- ![img.png](docs/img.png)
 3. 다운로드 버튼을 클릭합니다.
 4. 다운받은 파일을 저장할 경로를 선택합니다.
-![img_1.png](docs/img_1.png)
+- ![img_1.png](docs/img_1.png)
 5. 다운이 완료됩니다.
-![img_2.png](docs/img_2.png)
-![img_4.png](docs/img_4.png)
+- ![img_2.png](docs/img_2.png)
+- ![img_4.png](docs/img_4.png)
 
 ## 추가 내용
 - rc 버전은 다운이 잘 안될 수도 있습니다.
