@@ -1,6 +1,5 @@
 package me.phdljr.controller;
 
-import me.phdljr.api.PaperApiClient;
 import java.awt.BorderLayout;
 import java.io.File;
 import java.util.List;
@@ -15,6 +14,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
+import me.phdljr.api.PaperApiClient;
 import me.phdljr.service.PaperDownloader;
 
 public class PaperDownloaderGUI extends JFrame {
@@ -74,8 +74,8 @@ public class PaperDownloaderGUI extends JFrame {
                 try {
                     List<String> versions = get();
                     versionBox.removeAllItems();
-                    for (int i = versions.size() - 1; i >= 0; i--) {
-                        versionBox.addItem(versions.get(i));
+                    for (String version: versions) {
+                        versionBox.addItem(version);
                     }
 
                     log("버전 목록 불러오기 완료");
@@ -104,8 +104,8 @@ public class PaperDownloaderGUI extends JFrame {
                 try {
                     List<String> builds = get();
                     buildBox.removeAllItems();
-                    for (int i = builds.size() - 1; i >= 0; i--) {
-                        buildBox.addItem(builds.get(i));
+                    for (String build: builds) {
+                        buildBox.addItem(build);
                     }
 
                     log(version + "빌드 목록 불러오기 완료");
@@ -126,7 +126,6 @@ public class PaperDownloaderGUI extends JFrame {
         }
 
         String jarName = apiClient.getJarName(version, build);
-        String urlStr = apiClient.getDownloadUrl(version, build);
 
         JFileChooser chooser = new JFileChooser();
         chooser.setDialogTitle("다운로드 위치 선택");
@@ -141,6 +140,7 @@ public class PaperDownloaderGUI extends JFrame {
         new SwingWorker<Void, String>() {
             @Override
             protected Void doInBackground() throws Exception {
+                String urlStr = apiClient.getDownloadUrl(version, build);
                 progressBar.setValue(0);
                 publish("다운로드 시작: " + urlStr);
                 downloader.download(urlStr, outFile);

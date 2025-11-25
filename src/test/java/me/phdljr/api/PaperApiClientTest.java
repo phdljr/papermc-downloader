@@ -9,52 +9,40 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
-public class PaperApiClient {
+public class PaperApiClientTest {
 
     private static final String BASE = "https://fill.papermc.io/v3/projects/paper";
     private final HttpClient client = HttpClient.newHttpClient();
     private final ObjectMapper mapper = new ObjectMapper();
 
-    public List<String> getVersions() throws Exception {
+    @Test
+    public void getVersions() throws Exception {
         HttpRequest req = HttpRequest.newBuilder(URI.create(BASE)).GET().build();
         HttpResponse<String> resp = client.send(req, HttpResponse.BodyHandlers.ofString());
         JsonNode root = mapper.readTree(resp.body());
         List<String> versions = new ArrayList<>();
+
         JsonNode versionsNode = root.get("versions");
 
         versionsNode.fields().forEachRemaining(entry -> {
-            JsonNode arr = entry.getValue();
-            arr.forEach(n -> versions.add(n.asText()));
+            JsonNode arr = entry.getValue(); // 배열 노드
+            arr.forEach(n -> versions.add(n.asText())); // 배열 요소 추가
         });
-
-        return versions;
     }
 
-    public List<String> getBuilds(String version) throws Exception {
-        HttpRequest req = HttpRequest.newBuilder(URI.create(BASE + "/versions/" + version)).GET()
-            .build();
-        HttpResponse<String> resp = client.send(req, HttpResponse.BodyHandlers.ofString());
-        JsonNode root = mapper.readTree(resp.body());
-        List<String> builds = new ArrayList<>();
-        root.get("builds").forEach(n -> builds.add(n.asText()));
-        return builds;
-    }
-
-    public String getDownloadUrl(String version, String build)
-        throws IOException, InterruptedException {
+    @Test
+    public void getDownloadUrl() throws IOException, InterruptedException {
+        String version = "1.21.10";
+        String build = "115";
         HttpRequest req = HttpRequest.newBuilder(
                 URI.create(BASE + "/versions/" + version + "/builds/" + build))
             .GET()
             .build();
         HttpResponse<String> resp = client.send(req, HttpResponse.BodyHandlers.ofString());
         JsonNode root = mapper.readTree(resp.body());
-
-        return root.get("downloads").findValue("url").asText();
-    }
-
-    public String getJarName(String version, String build) {
-        return String.format("paper-%s-%s.jar", version, build);
+        String downloadUrl = root.get("downloads").findValue("url").asText();
     }
 }
-
