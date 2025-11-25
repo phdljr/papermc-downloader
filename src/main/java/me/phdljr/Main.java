@@ -1,4 +1,6 @@
-import controller.PaperDownloaderGUI;
+package me.phdljr;
+
+import me.phdljr.controller.PaperDownloaderGUI;
 import javax.swing.SwingUtilities;
 
 public class Main {

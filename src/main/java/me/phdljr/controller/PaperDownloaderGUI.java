@@ -1,12 +1,8 @@
-package controller;
+package me.phdljr.controller;
 
-import api.PaperApiClient;
+import me.phdljr.api.PaperApiClient;
 import java.awt.BorderLayout;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -19,7 +15,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
-import service.PaperDownloader;
+import me.phdljr.service.PaperDownloader;
 
 public class PaperDownloaderGUI extends JFrame {
 
