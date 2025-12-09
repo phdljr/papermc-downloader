@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.io.File;
 import java.util.List;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -12,21 +13,26 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import me.phdljr.api.PaperApiClient;
 import me.phdljr.service.PaperDownloader;
+import me.phdljr.service.StartFileCreator;
 
 public class PaperDownloaderGUI extends JFrame {
 
     private final PaperApiClient apiClient = new PaperApiClient();
     private final PaperDownloader downloader = new PaperDownloader();
+    private final StartFileCreator startFileCreator = new StartFileCreator();
 
     private final JComboBox<String> versionBox = new JComboBox<>();
     private final JComboBox<String> buildBox = new JComboBox<>();
     private final JButton downloadButton = new JButton("다운로드");
     private final JTextArea logArea = new JTextArea(10, 40);
     private final JProgressBar progressBar = new JProgressBar(0, 100);
+    private final JCheckBox startFileCreateCheckBox = new JCheckBox("실행 파일 생성");
+    private final JTextField memoryTextField = new JTextField("4");
 
     public PaperDownloaderGUI() {
         super("PaperMC Downloader");
@@ -38,6 +44,10 @@ public class PaperDownloaderGUI extends JFrame {
         topPanel.add(new JLabel("빌드:"));
         topPanel.add(buildBox);
         topPanel.add(downloadButton);
+        startFileCreateCheckBox.setSelected(true);
+        topPanel.add(startFileCreateCheckBox);
+        topPanel.add(new JLabel("메모리(GB)"));
+        topPanel.add(memoryTextField);
 
         add(topPanel, BorderLayout.NORTH);
         add(new JScrollPane(logArea), BorderLayout.CENTER);
@@ -52,7 +62,8 @@ public class PaperDownloaderGUI extends JFrame {
         downloadButton.addActionListener(e -> downloadJar());
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        pack();
+        setSize(700, 300);
+        setLocationRelativeTo(null);
         setVisible(true);
     }
 
@@ -135,8 +146,15 @@ public class PaperDownloaderGUI extends JFrame {
             log("다운로드 취소됨");
             return;
         }
-        File outFile = chooser.getSelectedFile();
 
+        File outFile = chooser.getSelectedFile();
+        if(startFileCreateCheckBox.isSelected())
+            createStartFile(outFile);
+
+        downloadJarFile(version, build, outFile);
+    }
+
+    private void downloadJarFile(String version, String build, File outFile) {
         new SwingWorker<Void, String>() {
             @Override
             protected Void doInBackground() throws Exception {
@@ -163,6 +181,36 @@ public class PaperDownloaderGUI extends JFrame {
                     log("서버 실행 예시: java -Xms1G -Xmx2G -jar " + outFile.getName() + " nogui");
                 } catch (Exception ex) {
                     log("다운로드 실패: " + ex.getMessage());
+                }
+            }
+        }.execute();
+    }
+
+    private void createStartFile(File outFile) {
+        new SwingWorker<Void, String>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                String memory = memoryTextField.getText();
+                if(memory.isEmpty())
+                    memory = "2";
+
+                publish("실행 파일 생성 시작");
+                startFileCreator.createStartFile(outFile, memory);
+                return null;
+            }
+
+            @Override
+            protected void process(List<String> chunks) {
+                chunks.forEach(msg -> log(msg));
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    get();
+                    log("실행 파일 생성 성공");
+                } catch (Exception ex) {
+                    log("실행 파일 생성 실패: " + ex.getMessage());
                 }
             }
         }.execute();
