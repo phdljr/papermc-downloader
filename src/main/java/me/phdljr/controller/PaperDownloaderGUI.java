@@ -16,6 +16,10 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
 import me.phdljr.api.PaperApiClient;
 import me.phdljr.service.PaperDownloader;
 import me.phdljr.service.StartFileCreator;
@@ -47,6 +51,8 @@ public class PaperDownloaderGUI extends JFrame {
         startFileCreateCheckBox.setSelected(true);
         topPanel.add(startFileCreateCheckBox);
         topPanel.add(new JLabel("메모리(GB)"));
+        ((AbstractDocument)memoryTextField.getDocument()).setDocumentFilter(new OnlyNumberFilter());
+        memoryTextField.setColumns(3);
         topPanel.add(memoryTextField);
 
         add(topPanel, BorderLayout.NORTH);
