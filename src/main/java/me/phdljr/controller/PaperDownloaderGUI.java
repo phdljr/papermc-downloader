@@ -27,13 +27,11 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 import javax.swing.text.AbstractDocument;
 import me.phdljr.api.PaperApiClient;
-import me.phdljr.service.PaperDownloader;
 import me.phdljr.service.StartFileCreator;
 
 public class PaperDownloaderGUI extends JFrame {
 
     private final PaperApiClient apiClient = new PaperApiClient();
-    private final PaperDownloader downloader = new PaperDownloader();
     private final StartFileCreator startFileCreator = new StartFileCreator();
 
     private final JComboBox<String> versionBox = new JComboBox<>();
@@ -268,10 +266,9 @@ public class PaperDownloaderGUI extends JFrame {
         new SwingWorker<Void, String>() {
             @Override
             protected Void doInBackground() throws Exception {
-                String urlStr = apiClient.getDownloadUrl(version, build);
                 progressBar.setValue(0);
-                publish("다운로드 시작: " + urlStr);
-                downloader.download(urlStr, outFile);
+                publish("jar 다운로드 시작");
+                apiClient.downloadJar(version, build, outFile);
                 SwingUtilities.invokeLater(() -> progressBar.setIndeterminate(true));
                 return null;
             }
