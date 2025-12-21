@@ -1,6 +1,12 @@
 package me.phdljr.controller;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.io.File;
 import java.util.List;
 import javax.swing.JButton;
@@ -16,10 +22,9 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.MatteBorder;
 import javax.swing.text.AbstractDocument;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DocumentFilter;
 import me.phdljr.api.PaperApiClient;
 import me.phdljr.service.PaperDownloader;
 import me.phdljr.service.StartFileCreator;
@@ -42,25 +47,7 @@ public class PaperDownloaderGUI extends JFrame {
         super("PaperMC Downloader");
 
         setLayout(new BorderLayout());
-        JPanel topPanel = new JPanel();
-        topPanel.add(new JLabel("버전:"));
-        topPanel.add(versionBox);
-        topPanel.add(new JLabel("빌드:"));
-        topPanel.add(buildBox);
-        topPanel.add(downloadButton);
-        startFileCreateCheckBox.setSelected(true);
-        topPanel.add(startFileCreateCheckBox);
-        topPanel.add(new JLabel("메모리(GB)"));
-        ((AbstractDocument)memoryTextField.getDocument()).setDocumentFilter(new OnlyNumberFilter());
-        memoryTextField.setColumns(3);
-        topPanel.add(memoryTextField);
-
-        add(topPanel, BorderLayout.NORTH);
-        add(new JScrollPane(logArea), BorderLayout.CENTER);
-        add(progressBar, BorderLayout.SOUTH);
-
-        logArea.setEditable(false);
-        progressBar.setStringPainted(true);
+        setContentPane(buildContent());
 
         loadVersionsAsync();
 
@@ -71,6 +58,114 @@ public class PaperDownloaderGUI extends JFrame {
         setSize(700, 300);
         setLocationRelativeTo(null);
         setVisible(true);
+    }
+
+    private JPanel buildContent() {
+        JPanel container = new JPanel(new BorderLayout());
+        container.setBackground(new Color(20, 24, 28));
+        container.setBorder(new EmptyBorder(18, 18, 18, 18));
+
+        JLabel title = new JLabel("PaperMC Downloader");
+        title.setForeground(new Color(230, 235, 241));
+        title.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 20));
+        title.setBorder(new EmptyBorder(0, 0, 10, 0));
+        container.add(title, BorderLayout.NORTH);
+
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        formPanel.setBackground(new Color(32, 37, 42));
+        formPanel.setBorder(new EmptyBorder(14, 14, 14, 14));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(6, 6, 6, 6);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1;
+
+        styleComboBox(versionBox);
+        styleComboBox(buildBox);
+        startFileCreateCheckBox.setBackground(formPanel.getBackground());
+        startFileCreateCheckBox.setForeground(new Color(220, 226, 232));
+        startFileCreateCheckBox.setFocusPainted(false);
+        startFileCreateCheckBox.setSelected(true);
+
+        ((AbstractDocument) memoryTextField.getDocument()).setDocumentFilter(new OnlyNumberFilter());
+        memoryTextField.setColumns(3);
+        memoryTextField.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        memoryTextField.setBorder(new MatteBorder(0, 0, 2, 0, new Color(65, 110, 255)));
+        memoryTextField.setBackground(new Color(43, 48, 54));
+        memoryTextField.setForeground(Color.WHITE);
+        memoryTextField.setCaretColor(Color.WHITE);
+        memoryTextField.setHorizontalAlignment(JTextField.CENTER);
+
+        addField(formPanel, gbc, 0, "버전", versionBox);
+        addField(formPanel, gbc, 1, "빌드", buildBox);
+        addField(formPanel, gbc, 2, "메모리(GB)", memoryTextField);
+
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.gridwidth = 2;
+        formPanel.add(startFileCreateCheckBox, gbc);
+
+        stylePrimaryButton(downloadButton);
+        gbc.gridx = 2;
+        gbc.gridwidth = 1;
+        formPanel.add(downloadButton, gbc);
+
+        logArea.setEditable(false);
+        logArea.setFont(new Font("Consolas", Font.PLAIN, 12));
+        logArea.setBackground(new Color(18, 20, 24));
+        logArea.setForeground(new Color(191, 198, 207));
+        logArea.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+        JScrollPane scrollPane = new JScrollPane(logArea);
+        scrollPane.setBorder(new MatteBorder(1, 0, 0, 0, new Color(50, 55, 62)));
+        scrollPane.getViewport().setBackground(logArea.getBackground());
+
+        progressBar.setStringPainted(true);
+        progressBar.setPreferredSize(new Dimension(0, 26));
+        progressBar.setBackground(new Color(36, 40, 46));
+        progressBar.setForeground(new Color(93, 174, 255));
+        progressBar.setBorder(new MatteBorder(0, 0, 0, 0, container.getBackground()));
+
+        JPanel center = new JPanel(new BorderLayout(0, 12));
+        center.setBackground(container.getBackground());
+        center.add(formPanel, BorderLayout.NORTH);
+        center.add(scrollPane, BorderLayout.CENTER);
+
+        container.add(center, BorderLayout.CENTER);
+        container.add(progressBar, BorderLayout.SOUTH);
+        return container;
+    }
+
+    private void addField(JPanel panel, GridBagConstraints gbc, int row, String labelText, java.awt.Component input) {
+        JLabel label = new JLabel(labelText);
+        label.setForeground(new Color(200, 206, 215));
+        label.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+
+        gbc.gridx = 0;
+        gbc.gridy = row;
+        gbc.weightx = 0.2;
+        panel.add(label, gbc);
+
+        gbc.gridx = 1;
+        gbc.weightx = 0.6;
+        panel.add(input, gbc);
+    }
+
+    private void styleComboBox(JComboBox<String> comboBox) {
+        comboBox.setBackground(new Color(43, 48, 54));
+        comboBox.setForeground(Color.WHITE);
+        comboBox.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        comboBox.setBorder(new MatteBorder(0, 0, 2, 0, new Color(65, 110, 255)));
+        comboBox.setPreferredSize(new Dimension(120, 28));
+    }
+
+    private void stylePrimaryButton(JButton button) {
+        button.setBackground(new Color(65, 110, 255));
+        button.setForeground(Color.WHITE);
+        button.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 14));
+        button.setFocusPainted(false);
+        button.setPreferredSize(new Dimension(110, 36));
+        button.setBorder(new EmptyBorder(8, 14, 8, 14));
     }
 
     private void loadVersionsAsync() {
@@ -154,7 +249,7 @@ public class PaperDownloaderGUI extends JFrame {
         }
 
         File outFile = chooser.getSelectedFile();
-        if(startFileCreateCheckBox.isSelected())
+        if (startFileCreateCheckBox.isSelected())
             createStartFile(outFile);
 
         downloadJarFile(version, build, outFile);
@@ -226,4 +321,3 @@ public class PaperDownloaderGUI extends JFrame {
         logArea.append(msg + "\n");
     }
 }
-
