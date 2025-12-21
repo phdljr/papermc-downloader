@@ -22,6 +22,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
+import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 import javax.swing.text.AbstractDocument;
@@ -56,11 +57,10 @@ public class PaperDownloaderGUI extends JFrame {
         downloadButton.addActionListener(e -> downloadJar());
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(700, 300);
+        setSize(700, 700);
         setLocationRelativeTo(null);
         setVisible(true);
     }
-
     private JPanel buildContent() {
         JPanel container = new JPanel(new BorderLayout());
         container.setBackground(new Color(20, 24, 28));
@@ -68,7 +68,7 @@ public class PaperDownloaderGUI extends JFrame {
 
         JLabel title = new JLabel("PaperMC Downloader");
         title.setForeground(new Color(230, 235, 241));
-        title.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 20));
+        title.setFont(primaryFont(20f, Font.BOLD));
         title.setBorder(new EmptyBorder(0, 0, 10, 0));
         container.add(title, BorderLayout.NORTH);
 
@@ -90,7 +90,7 @@ public class PaperDownloaderGUI extends JFrame {
 
         ((AbstractDocument) memoryTextField.getDocument()).setDocumentFilter(new OnlyNumberFilter());
         memoryTextField.setColumns(3);
-        memoryTextField.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        memoryTextField.setFont(primaryFont(13f, Font.PLAIN));
         memoryTextField.setBorder(new MatteBorder(0, 0, 2, 0, new Color(65, 110, 255)));
         memoryTextField.setBackground(new Color(43, 48, 54));
         memoryTextField.setForeground(Color.WHITE);
@@ -107,12 +107,12 @@ public class PaperDownloaderGUI extends JFrame {
         formPanel.add(startFileCreateCheckBox, gbc);
 
         stylePrimaryButton(downloadButton);
-        gbc.gridx = 2;
-        gbc.gridwidth = 1;
+        gbc.gridy = 4;
+        gbc.gridwidth = 3;
         formPanel.add(downloadButton, gbc);
 
         logArea.setEditable(false);
-        logArea.setFont(new Font("Consolas", Font.PLAIN, 12));
+        logArea.setFont(primaryFont(12f, Font.PLAIN));
         logArea.setBackground(new Color(18, 20, 24));
         logArea.setForeground(new Color(191, 198, 207));
         logArea.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -140,7 +140,7 @@ public class PaperDownloaderGUI extends JFrame {
     private void addField(JPanel panel, GridBagConstraints gbc, int row, String labelText, java.awt.Component input) {
         JLabel label = new JLabel(labelText);
         label.setForeground(new Color(200, 206, 215));
-        label.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        label.setFont(primaryFont(13f, Font.PLAIN));
 
         gbc.gridx = 0;
         gbc.gridy = row;
@@ -155,7 +155,7 @@ public class PaperDownloaderGUI extends JFrame {
     private void styleComboBox(JComboBox<String> comboBox) {
         comboBox.setBackground(new Color(43, 48, 54));
         comboBox.setForeground(Color.WHITE);
-        comboBox.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        comboBox.setFont(primaryFont(13f, Font.PLAIN));
         comboBox.setBorder(new MatteBorder(0, 0, 2, 0, new Color(65, 110, 255)));
         comboBox.setPreferredSize(new Dimension(120, 28));
     }
@@ -163,10 +163,18 @@ public class PaperDownloaderGUI extends JFrame {
     private void stylePrimaryButton(JButton button) {
         button.setBackground(new Color(65, 110, 255));
         button.setForeground(Color.WHITE);
-        button.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 14));
+        button.setFont(primaryFont(14f, Font.BOLD));
         button.setFocusPainted(false);
         button.setPreferredSize(new Dimension(110, 36));
         button.setBorder(new EmptyBorder(8, 14, 8, 14));
+    }
+
+    private Font primaryFont(float size, int style) {
+        Font fallback = new Font("Segoe UI", style, Math.round(size));
+        if (baseFont == null) {
+            return fallback;
+        }
+        return baseFont.deriveFont(style, size);
     }
 
     private void loadVersionsAsync() {
