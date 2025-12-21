@@ -9,13 +9,15 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
+import me.phdljr.application.port.out.PaperApiPort;
 
-public class PaperApiClient {
+public class PaperApiClient implements PaperApiPort {
 
     private static final String BASE = "https://fill.papermc.io/v3/projects/paper";
     private final HttpClient client = HttpClient.newHttpClient();
     private final ObjectMapper mapper = new ObjectMapper();
 
+    @Override
     public List<String> getVersions() throws Exception {
         HttpRequest req = HttpRequest.newBuilder(URI.create(BASE)).GET().build();
         HttpResponse<String> resp = client.send(req, HttpResponse.BodyHandlers.ofString());
@@ -31,6 +33,7 @@ public class PaperApiClient {
         return versions;
     }
 
+    @Override
     public List<String> getBuilds(String version) throws Exception {
         HttpRequest req = HttpRequest.newBuilder(URI.create(BASE + "/versions/" + version)).GET()
             .build();
@@ -41,6 +44,7 @@ public class PaperApiClient {
         return builds;
     }
 
+    @Override
     public String getDownloadUrl(String version, String build)
         throws IOException, InterruptedException {
         HttpRequest req = HttpRequest.newBuilder(
@@ -53,8 +57,8 @@ public class PaperApiClient {
         return root.get("downloads").findValue("url").asText();
     }
 
+    @Override
     public String getJarName(String version, String build) {
         return String.format("paper-%s-%s.jar", version, build);
     }
 }
-

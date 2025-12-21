@@ -4,9 +4,11 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import me.phdljr.application.port.out.StartFilePort;
 
-public class StartFileCreator {
+public class StartFileCreator implements StartFilePort {
 
+    @Override
     public void createStartFile(File jarFile, String memory) throws IOException {
         createBatchFile(jarFile, memory);
         createEulaFile(jarFile.getParentFile());

@@ -9,11 +9,13 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import me.phdljr.application.port.out.FileDownloadPort;
 
-public class PaperDownloader {
+public class PaperDownloader implements FileDownloadPort {
 
     private final HttpClient client = HttpClient.newHttpClient();
 
+    @Override
     public void download(String url, File outFile) throws Exception {
         HttpRequest req = HttpRequest.newBuilder(URI.create(url)).GET().build();
         HttpResponse<InputStream> resp = client.send(req,
