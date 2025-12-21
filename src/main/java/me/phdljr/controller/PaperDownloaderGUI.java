@@ -42,6 +42,7 @@ public class PaperDownloaderGUI extends JFrame {
     private final JProgressBar progressBar = new JProgressBar(0, 100);
     private final JCheckBox startFileCreateCheckBox = new JCheckBox("실행 파일 생성");
     private final JTextField memoryTextField = new JTextField("4");
+    private final Font baseFont = UIManager.getFont("Label.font");
 
     public PaperDownloaderGUI() {
         super("PaperMC Downloader");
